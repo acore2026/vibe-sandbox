@@ -6,6 +6,7 @@ PUBLIC_PORT="${1:-7901}"
 PUBLIC_HOST="${PUBLIC_HOST:-101.245.78.174}"
 IDLE_TIMEOUT_SECONDS="${IDLE_TIMEOUT_SECONDS:-1800}"
 REAPER_INTERVAL_SECONDS="${REAPER_INTERVAL_SECONDS:-60}"
+MAX_SESSIONS="${MAX_SESSIONS:-40}"
 PID_FILE="${PID_FILE:-/tmp/vibe-dynamic-router.pid}"
 LOG_FILE="${LOG_FILE:-/tmp/vibe-dynamic-router.log}"
 
@@ -26,6 +27,7 @@ PUBLIC_PORT="$PUBLIC_PORT" \
 PUBLIC_HOST="$PUBLIC_HOST" \
 IDLE_TIMEOUT_SECONDS="$IDLE_TIMEOUT_SECONDS" \
 REAPER_INTERVAL_SECONDS="$REAPER_INTERVAL_SECONDS" \
+MAX_SESSIONS="$MAX_SESSIONS" \
   setsid python3 ./dynamic_router.py >"$LOG_FILE" 2>&1 &
 router_pid="$!"
 echo "$router_pid" > "$PID_FILE"
@@ -48,6 +50,9 @@ Logs:
 
 Idle cleanup:
   ${IDLE_TIMEOUT_SECONDS} seconds
+
+Capacity:
+  ${MAX_SESSIONS} sessions
 
 Stop:
   kill ${router_pid}

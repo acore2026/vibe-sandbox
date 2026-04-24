@@ -21,6 +21,7 @@ TERMINAL_PORT = int(os.environ.get("TERMINAL_PORT", "8080"))
 PREVIEW_PORT = int(os.environ.get("PREVIEW_PORT", "3000"))
 IDLE_TIMEOUT_SECONDS = int(os.environ.get("IDLE_TIMEOUT_SECONDS", str(30 * 60)))
 REAPER_INTERVAL_SECONDS = int(os.environ.get("REAPER_INTERVAL_SECONDS", "60"))
+MAX_SESSIONS = int(os.environ.get("MAX_SESSIONS", "40"))
 SESSION_STATE_FILE = os.environ.get("SESSION_STATE_FILE", "/tmp/vibe-session-state.json")
 USERNAME_RE = re.compile(r"^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,31}$")
 RESERVED_NAMES = {
@@ -32,6 +33,7 @@ RESERVED_NAMES = {
     "static",
 }
 STATE_LOCK = threading.Lock()
+SESSION_CREATE_LOCK = threading.Lock()
 SESSION_STATE = {"last_access": {}}
 
 
@@ -147,22 +149,34 @@ def container_running(username):
     return container_name(username) in set(result.stdout.splitlines())
 
 
+def session_capacity_message():
+    return (
+        f"Sandbox capacity reached: {MAX_SESSIONS} active sessions are already running. "
+        "Try again later or ask an administrator to stop an unused session."
+    )
+
+
 def ensure_session(username):
     if not USERNAME_RE.match(username) or username in RESERVED_NAMES:
         raise ValueError("Invalid username. Use 1-32 characters from a-z, A-Z, 0-9, _, ., -.")
 
-    if container_running(username):
-        mark_access(username)
-        return
-
-    run(["./launch_routed_session.sh", username])
-    mark_access(username)
-
-    deadline = time.time() + 20
-    while time.time() < deadline:
-        if container_ip(username):
+    with SESSION_CREATE_LOCK:
+        if container_running(username):
+            mark_access(username)
             return
-        time.sleep(0.25)
+
+        running_sessions = len(list_user_containers())
+        if MAX_SESSIONS > 0 and running_sessions >= MAX_SESSIONS:
+            raise RuntimeError(session_capacity_message())
+
+        run(["./launch_routed_session.sh", username])
+        mark_access(username)
+
+        deadline = time.time() + 20
+        while time.time() < deadline:
+            if container_ip(username):
+                return
+            time.sleep(0.25)
     raise RuntimeError(f"Timed out waiting for {container_name(username)} to get an IP address")
 
 
@@ -433,6 +447,7 @@ class Router(BaseHTTPRequestHandler):
     </form>
     <section class="panel">
       <p>Active sessions on <code>{html.escape(PUBLIC_HOST)}:{PUBLIC_PORT}</code></p>
+      <p>Capacity limit: <code>{len(users)} / {MAX_SESSIONS}</code> active sessions.</p>
       <p>Run a web app inside the sandbox on <code>0.0.0.0:{PREVIEW_PORT}</code>, then open <code>/your-name/preview/</code>.</p>
       <p>Unused sessions are stopped after <code>{IDLE_TIMEOUT_SECONDS // 60}</code> idle minutes.</p>
       <ul>{sessions}</ul>
