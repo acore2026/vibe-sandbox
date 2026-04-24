@@ -63,6 +63,37 @@ mapfile -t USERS < <(
       letter-spacing: -0.06em;
     }
     p { color: #b9cbae; }
+    form {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 22px 0;
+    }
+    input {
+      flex: 1;
+      min-width: 180px;
+      border: 1px solid #33422d;
+      border-radius: 999px;
+      background: #0b110c;
+      color: #e8f5df;
+      padding: 14px 16px;
+      font: inherit;
+      outline: none;
+    }
+    input:focus {
+      border-color: #d7ff5f;
+      box-shadow: 0 0 0 3px rgba(215,255,95,.14);
+    }
+    button {
+      border: 0;
+      border-radius: 999px;
+      background: #d7ff5f;
+      color: #07110d;
+      padding: 14px 18px;
+      font: inherit;
+      font-weight: 900;
+      cursor: pointer;
+    }
     .panel {
       border: 1px solid #263620;
       background: rgba(5,8,6,.72);
@@ -112,6 +143,10 @@ mapfile -t USERS < <(
       <section class="sidebar">
         <h1>Vibe Coding Sandbox</h1>
         <p>One public entry point on port 7901 routes each teammate to their own terminal and app preview.</p>
+        <form id="launch-form">
+          <input id="username" name="username" autocomplete="name" placeholder="Your name, e.g. ljm" required pattern="[A-Za-z0-9][A-Za-z0-9_.-]{0,31}">
+          <button type="submit">Launch Terminal</button>
+        </form>
         <div>
           <span class="chip">Terminal: /name/</span>
           <span class="chip">Preview: /name/preview/</span>
@@ -140,6 +175,17 @@ EOF
       </section>
     </div>
   </main>
+  <script>
+    document.getElementById('launch-form').addEventListener('submit', function (event) {
+      event.preventDefault();
+      var username = document.getElementById('username').value.trim();
+      if (!/^[A-Za-z0-9][A-Za-z0-9_.-]{0,31}$/.test(username)) {
+        alert('Use 1-32 characters from a-z, A-Z, 0-9, _, ., -');
+        return;
+      }
+      window.location.href = '/' + encodeURIComponent(username) + '/';
+    });
+  </script>
 </body>
 </html>
 EOF

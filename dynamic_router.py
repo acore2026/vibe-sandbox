@@ -339,6 +339,30 @@ def page(title, body, status=200):
     return status, payload.encode("utf-8")
 
 
+def should_inject_preview_button(headers, is_preview):
+    if is_preview:
+        return False
+    for key, value in headers:
+        if key.lower() == "content-type" and "text/html" in value.lower():
+            return True
+    return False
+
+
+def inject_preview_button(payload, username):
+    try:
+        html_payload = payload.decode("utf-8")
+    except UnicodeDecodeError:
+        return payload
+
+    marker = "</body>"
+    if marker not in html_payload or "vibe-preview-button" in html_payload:
+        return payload
+
+    quoted_user = urllib.parse.quote(username)
+    button = f"""<a class="vibe-preview-button" href="/{quoted_user}/preview/" target="_blank" rel="noopener">Open Web App</a><style>.vibe-preview-button{{position:fixed;right:18px;top:14px;z-index:2147483647;border:0;border-radius:999px;background:#d7ff5f;color:#07110d!important;padding:11px 16px;font:800 14px/1.1 sans-serif;text-decoration:none!important;box-shadow:0 10px 30px rgba(0,0,0,.35)}}.vibe-preview-button:hover{{filter:brightness(1.05)}}</style>"""
+    return html_payload.replace(marker, button + marker, 1).encode("utf-8")
+
+
 class Router(BaseHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
 
@@ -405,7 +429,7 @@ class Router(BaseHTTPRequestHandler):
     <p>Enter your name to create or resume an isolated sandbox container.</p>
     <form method="post" action="/sessions">
       <input name="username" autocomplete="name" placeholder="Your name, e.g. alice" required pattern="[A-Za-z0-9][A-Za-z0-9_.-]{{0,31}}">
-      <button type="submit">Start Sandbox</button>
+      <button type="submit">Launch Terminal</button>
     </form>
     <section class="panel">
       <p>Active sessions on <code>{html.escape(PUBLIC_HOST)}:{PUBLIC_PORT}</code></p>
@@ -502,7 +526,7 @@ class Router(BaseHTTPRequestHandler):
         headers = {}
         for key, value in self.headers.items():
             lower = key.lower()
-            if lower in HOP_BY_HOP_HEADERS or lower == "host":
+            if lower in HOP_BY_HOP_HEADERS or lower in {"host", "accept-encoding"}:
                 continue
             headers[key] = value
         headers["Host"] = f"{ip}:{upstream_port}"
@@ -525,12 +549,18 @@ class Router(BaseHTTPRequestHandler):
         finally:
             conn.close()
 
+        response_headers = resp.getheaders()
+        if not head_only and should_inject_preview_button(response_headers, is_preview):
+            payload = inject_preview_button(payload, username)
+
         self.send_response(resp.status, resp.reason)
-        for key, value in resp.getheaders():
+        for key, value in response_headers:
             lower = key.lower()
             if lower in HOP_BY_HOP_HEADERS:
                 continue
             if lower == "content-length":
+                continue
+            if lower == "content-encoding":
                 continue
             self.send_header(key, value)
         self.send_header("Content-Length", str(len(payload)))
