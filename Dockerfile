@@ -2,6 +2,7 @@ FROM ubuntu:24.04
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG NODE_MAJOR=20
+ARG CODEX_VERSION=0.124.0
 
 ENV LANG=C.UTF-8 \
     LC_ALL=C.UTF-8 \
@@ -46,7 +47,7 @@ RUN mkdir -p /etc/apt/keyrings && \
     echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_${NODE_MAJOR}.x nodistro main" > /etc/apt/sources.list.d/nodesource.list && \
     apt-get update && \
     apt-get install -y --no-install-recommends nodejs && \
-    npm install -g @openai/codex opencode-ai && \
+    npm install -g "@openai/codex@${CODEX_VERSION}" opencode-ai && \
     npm install --prefix /opt/http-terminal @xterm/xterm @xterm/addon-fit && \
     rm -rf /var/lib/apt/lists/*
 
