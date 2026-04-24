@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vibe Coding Sandbox Architecture</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom arrow pulse animation */
+        @keyframes flow {
+            0% { transform: translateY(-2px); opacity: 0.5; }
+            50% { transform: translateY(2px); opacity: 1; }
+            100% { transform: translateY(-2px); opacity: 0.5; }
+        }
+        .animate-flow {
+            animation: flow 2s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-[#050806] min-h-screen p-4 md:p-8 font-sans text-[#e8f5df] flex justify-center">
+
+    <div class="max-w-5xl w-full">
+        <!-- Header -->
+        <div class="text-center mb-10">
+            <h1 class="text-3xl font-extrabold text-[#f3ffe8] tracking-tight mb-2">Vibe Coding Sandbox Architecture</h1>
+            <p class="text-[#9fb092] font-medium">One public Nginx router, isolated teammate containers, terminal and app preview routes</p>
+        </div>
+
+        <!-- Diagram Container -->
+        <div class="flex flex-col items-center w-full space-y-4">
+
+            <!-- 1. Users Layer -->
+            <div class="bg-[#0b120d] border-2 border-[#365a63] shadow-[0_10px_30px_rgba(0,0,0,.2)] rounded-xl p-4 w-64 text-center z-10 hover:shadow-[0_18px_55px_rgba(0,0,0,.28)] transition-shadow relative">
+                <div class="flex justify-center mb-2">
+                    <svg class="w-8 h-8 text-[#5cc8ff]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>
+                </div>
+                <h3 class="font-bold text-[#e8f5df]">Teammate Browsers</h3>
+                <p class="text-xs text-[#9fb092] mt-1">HTTP Access</p>
+            </div>
+
+            <!-- Arrow Down -->
+            <div class="animate-flow text-[#5cc8ff]">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+            </div>
+
+            <!-- 2. Entry Layer (Router) -->
+            <div class="bg-gradient-to-br from-[#10180f] to-[#0b120d] border-2 border-[#34452e] shadow-[0_18px_55px_rgba(0,0,0,.28)] rounded-xl p-6 w-full max-w-2xl z-10 relative">
+                <div class="absolute -top-3 -right-3 bg-[#d7ff5f] text-[#07110d] text-xs font-bold px-2 py-1 rounded-md shadow">Port: 7901</div>
+                
+                <h2 class="font-bold text-lg text-[#e8f5df] border-b border-[#263620] pb-2 mb-4 text-center">Huawei Cloud Server 101.245.78.174 (Entry Node)</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-[#0b120d] border border-[#263620] rounded-lg p-3 text-center shadow-[0_10px_30px_rgba(0,0,0,.2)]">
+                        <span class="block text-sm font-semibold text-[#bdf06b]">Home Page</span>
+                        <span class="text-xs text-[#9fb092]">Session links + architecture</span>
+                    </div>
+                    <div class="bg-[#162115] border border-[#34452e] rounded-lg p-3 text-center shadow-[0_10px_30px_rgba(0,0,0,.2)] ring-2 ring-[#263620]">
+                        <span class="block text-sm font-bold text-[#d7ff5f]">Nginx Router</span>
+                        <span class="text-xs text-[#a8cbff]">Routes /user and /user/preview</span>
+                    </div>
+                    <div class="bg-[#0b120d] border border-[#263620] rounded-lg p-3 text-center shadow-[0_10px_30px_rgba(0,0,0,.2)]">
+                        <span class="block text-sm font-semibold text-[#ffb4a8]">Preview Proxy</span>
+                        <span class="text-xs text-[#9fb092]">Container app port 3000</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Arrow Down -->
+            <div class="flex items-center gap-2 animate-flow text-[#a8cbff]">
+                <span class="text-xs font-semibold bg-[#0b120d] px-2 py-1 rounded-full border border-[#263620] text-[#a8cbff] shadow-[0_10px_30px_rgba(0,0,0,.2)]">Nginx Routes Into Docker Network</span>
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+            </div>
+
+            <!-- 3. Docker Network Layer -->
+            <div class="w-full max-w-4xl border-2 border-dashed border-[#3f6f55] bg-[#07110d]/70 rounded-2xl p-6 relative">
+                <div class="absolute -top-3 left-6 bg-[#102018] border border-[#3f6f55] text-[#d7ff5f] text-xs font-bold px-3 py-1 rounded-full shadow-[0_10px_30px_rgba(0,0,0,.2)]">
+                    vibe-net (Docker Network)
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-2">
+                    <!-- Container 1 -->
+                    <div class="bg-[#0b120d] border shadow-[0_10px_30px_rgba(0,0,0,.2)] border-[#2c4b38] rounded-xl overflow-hidden hover:shadow-[0_18px_55px_rgba(0,0,0,.28)] transition-shadow">
+                        <div class="bg-[#102018] px-4 py-2 border-b border-[#2c4b38] flex justify-between items-center">
+                            <span class="font-bold text-[#d7ff5f] text-sm">vibe-alice</span>
+                            <span class="flex h-2 w-2 rounded-full bg-[#6ee7b7]"></span>
+                        </div>
+                        <div class="p-4 text-sm space-y-2">
+                            <div class="flex items-center text-[#c9d8bf] bg-[#10180f] p-2 rounded">
+                                <span class="font-semibold w-16">UI:</span> /alice/ -> ShellInABox :8080
+                            </div>
+                            <div class="flex items-center text-[#c9d8bf] bg-[#10180f] p-2 rounded">
+                                <span class="font-semibold w-16">App:</span> /alice/preview/ -> :3000
+                            </div>
+                            <div class="flex items-center text-[#c9d8bf] bg-[#10180f] p-2 rounded">
+                                <span class="font-semibold w-16">Tools:</span> Codex + OpenCode CLI
+                            </div>
+                            <div class="flex items-center text-[#c9d8bf] bg-[#10180f] p-2 rounded">
+                                <span class="font-semibold w-16">Auth:</span> Codex + OpenCode state
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Container 2 -->
+                    <div class="bg-[#0b120d] border shadow-[0_10px_30px_rgba(0,0,0,.2)] border-[#2c4b38] rounded-xl overflow-hidden hover:shadow-[0_18px_55px_rgba(0,0,0,.28)] transition-shadow">
+                        <div class="bg-[#102018] px-4 py-2 border-b border-[#2c4b38] flex justify-between items-center">
+                            <span class="font-bold text-[#d7ff5f] text-sm">vibe-bob</span>
+                            <span class="flex h-2 w-2 rounded-full bg-[#6ee7b7]"></span>
+                        </div>
+                        <div class="p-4 text-sm space-y-2">
+                            <div class="flex items-center text-[#c9d8bf] bg-[#10180f] p-2 rounded">
+                                <span class="font-semibold w-16">UI:</span> /bob/ -> ShellInABox :8080
+                            </div>
+                            <div class="flex items-center text-[#c9d8bf] bg-[#10180f] p-2 rounded">
+                                <span class="font-semibold w-16">App:</span> /bob/preview/ -> :3000
+                            </div>
+                            <div class="flex items-center text-[#c9d8bf] bg-[#10180f] p-2 rounded">
+                                <span class="font-semibold w-16">Tools:</span> Codex + OpenCode CLI
+                            </div>
+                            <div class="flex items-center text-[#c9d8bf] bg-[#10180f] p-2 rounded">
+                                <span class="font-semibold w-16">Auth:</span> Codex + OpenCode state
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Container 3 -->
+                    <div class="bg-[#0b120d] border shadow-[0_10px_30px_rgba(0,0,0,.2)] border-[#2c4b38] rounded-xl overflow-hidden hover:shadow-[0_18px_55px_rgba(0,0,0,.28)] transition-shadow">
+                        <div class="bg-[#102018] px-4 py-2 border-b border-[#2c4b38] flex justify-between items-center">
+                            <span class="font-bold text-[#d7ff5f] text-sm">vibe-ljm</span>
+                            <span class="flex h-2 w-2 rounded-full bg-[#6ee7b7]"></span>
+                        </div>
+                        <div class="p-4 text-sm space-y-2">
+                            <div class="flex items-center text-[#c9d8bf] bg-[#10180f] p-2 rounded">
+                                <span class="font-semibold w-16">UI:</span> /ljm/ -> ShellInABox :8080
+                            </div>
+                            <div class="flex items-center text-[#c9d8bf] bg-[#10180f] p-2 rounded">
+                                <span class="font-semibold w-16">App:</span> /ljm/preview/ -> :3000
+                            </div>
+                            <div class="flex items-center text-[#c9d8bf] bg-[#10180f] p-2 rounded">
+                                <span class="font-semibold w-16">Tools:</span> Codex + OpenCode CLI
+                            </div>
+                            <div class="flex items-center text-[#c9d8bf] bg-[#10180f] p-2 rounded">
+                                <span class="font-semibold w-16">Auth:</span> Codex + OpenCode state
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Arrow Down -->
+            <div class="flex items-center gap-2 animate-flow text-[#6ee7b7]">
+                <span class="text-xs font-semibold bg-[#0b120d] px-2 py-1 rounded-full border border-[#263620] text-[#d7ff5f] shadow-[0_10px_30px_rgba(0,0,0,.2)]">HTTP Proxy Outbound</span>
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+            </div>
+
+            <!-- 4. Outbound / Proxy Layer -->
+            <div class="bg-[#060a07] text-white rounded-xl shadow-[0_22px_70px_rgba(0,0,0,.4)] p-6 w-full max-w-2xl z-10 flex flex-col md:flex-row items-center justify-between">
+                
+                <div class="flex-1 text-center md:text-left mb-4 md:mb-0">
+                    <h3 class="font-bold text-lg text-[#ffcb74]">Proxy Bridge Layer</h3>
+                    <p class="text-xs text-[#91a186] mt-1">Docker Bridge (17890) -> Host Proxy (7890)</p>
+                </div>
+
+                <div class="text-[#91a186] mx-4 hidden md:block">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path></svg>
+                </div>
+
+                <div class="flex-1 bg-[#10180f] rounded-lg p-3 text-center border border-[#263620]">
+                    <div class="flex justify-center mb-1">
+                        <svg class="w-6 h-6 text-[#6ee7b7]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <span class="block font-bold text-sm text-white">Internet & OpenAI APIs</span>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>

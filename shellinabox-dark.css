@@ -1,0 +1,47 @@
+html,
+body {
+  background: #050806;
+  color: #e8f5df;
+}
+
+#vt100 {
+  background: #050806;
+}
+
+#vt100 #scrollable {
+  background: #050806;
+  color: #e8f5df;
+}
+
+#vt100 #scrollable.inverted {
+  background: #e8f5df;
+  color: #050806;
+}
+
+#vt100 #cursor.bright {
+  background-color: #d7ff5f;
+  color: #050806;
+}
+
+#vt100 #cursor.dim {
+  background-color: #d7ff5f;
+  opacity: 0.35;
+  -moz-opacity: 0.35;
+  filter: alpha(opacity=35);
+}
+
+#vt100 .ansiDef {
+  color: #e8f5df;
+}
+
+#vt100 .ansiDefR {
+  color: #050806;
+}
+
+#vt100 .bgAnsiDef {
+  background-color: #050806;
+}
+
+#vt100 .bgAnsiDefR {
+  background-color: #e8f5df;
+}

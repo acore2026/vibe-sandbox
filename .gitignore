@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+
+.playwright/
+.playwright-cli/
+test-results/
+web-page-screenshot.png
+
+router/
+
+*.log
+*.pid
